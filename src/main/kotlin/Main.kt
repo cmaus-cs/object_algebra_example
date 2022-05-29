@@ -1,22 +1,18 @@
 fun main(args: Array<String>) {
 
-    println(e1(EvalExp()).eval())
+    with(EvalExp()) {
+        println(e1().eval())
+    }
 }
 
-//this is somewhat ugly, try to do syntactic sugaring here
-internal fun <T> e1(f: ExpAlg<T>): T {
-    return f.add(
-        f.lit(1),
-        f.add(
-            f.lit(2),
-            f.lit(3)
-        )
-    )
-}
+
+context(ExpAlg<T>)
+fun <T> e1(): T = lit(1) + lit(2) + lit(3)
+
 
 internal interface ExpAlg<T> {
     fun lit(n: Int): T
-    fun add(x: T, y: T): T
+    operator fun T.plus(value: T): T
 }
 
 internal interface Eval {
@@ -28,7 +24,9 @@ internal class EvalExp : ExpAlg<Eval> {
         override fun eval(): Int = n
     }
 
-    override fun add(x: Eval, y: Eval): Eval = object : Eval {
+    private fun add(x: Eval, y: Eval): Eval = object : Eval {
         override fun eval(): Int = x.eval() + y.eval()
     }
+
+    override fun Eval.plus(value: Eval): Eval = add(this, value)
 }
