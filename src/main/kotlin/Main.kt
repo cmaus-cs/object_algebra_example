@@ -6,6 +6,9 @@ fun main(args: Array<String>) {
     with(EvalMul()) {
         println(e2().eval())
     }
+    with (PrintMul()) {
+        println(e2().print())
+    }
 }
 
 
@@ -40,4 +43,24 @@ internal class EvalMul : EvalExp(), MulAlg<Eval> {
     private fun multiply(a: Eval, b: Eval) = Eval { a.eval() * b.eval() }
 
     override fun Eval.times(value: Eval): Eval = multiply(this, value)
+}
+
+internal fun interface Print {
+    fun print(): String
+}
+
+internal open class PrintExp : ExpAlg<Print> {
+    override fun lit(n: Int) = Print { "(lit $n)" }
+
+    private fun add(x: Print, y: Print) = Print { "(+ ${x.print()} ${y.print()})" }
+
+    override fun Print.plus(value: Print) = add(this, value)
+}
+
+internal class PrintMul : MulAlg<Print>, PrintExp() {
+    private fun multiply(a: Print, b: Print) = Print {
+        "(* ${a.print()} ${b.print()})"
+    }
+
+    override fun Print.times(value: Print) = multiply(this, value)
 }
