@@ -5,9 +5,11 @@ fun main(args: Array<String>) {
     }
     with(EvalMul()) {
         println(e2().eval())
+        println(e3().eval())
     }
     with (PrintMul()) {
         println(e2().print())
+        println(e3().print())
     }
 }
 
@@ -18,49 +20,6 @@ fun <T> e1(): T = lit(1) + lit(2) + lit(3)
 context(MulAlg<T>)
 fun <T> e2(): T = lit(5) + lit(6) * lit(4)
 
-internal interface ExpAlg<T> {
-    fun lit(n: Int): T
-    operator fun T.plus(value: T): T
-}
+context(MulAlg<T>)
+fun <T> e3(): T = (lit(5) + lit(6)) * lit(4)
 
-internal interface MulAlg<T> : ExpAlg<T> {
-    operator fun T.times(value: T): T
-}
-
-internal fun interface Eval {
-    fun eval(): Int
-}
-
-internal open class EvalExp : ExpAlg<Eval> {
-    override fun lit(n: Int): Eval = Eval { n }
-
-    private fun add(x: Eval, y: Eval): Eval = Eval { x.eval() + y.eval() }
-
-    override fun Eval.plus(value: Eval): Eval = add(this, value)
-}
-
-internal class EvalMul : EvalExp(), MulAlg<Eval> {
-    private fun multiply(a: Eval, b: Eval) = Eval { a.eval() * b.eval() }
-
-    override fun Eval.times(value: Eval): Eval = multiply(this, value)
-}
-
-internal fun interface Print {
-    fun print(): String
-}
-
-internal open class PrintExp : ExpAlg<Print> {
-    override fun lit(n: Int) = Print { "(lit $n)" }
-
-    private fun add(x: Print, y: Print) = Print { "(+ ${x.print()} ${y.print()})" }
-
-    override fun Print.plus(value: Print) = add(this, value)
-}
-
-internal class PrintMul : MulAlg<Print>, PrintExp() {
-    private fun multiply(a: Print, b: Print) = Print {
-        "(* ${a.print()} ${b.print()})"
-    }
-
-    override fun Print.times(value: Print) = multiply(this, value)
-}
