@@ -53,13 +53,7 @@ interface PaymentSelectionDsl {
 
 context(PaymentSelectionDsl)
 fun selectPaymentMethods(): PaymentSelectionDsl.PaymentSelection =
-    provided(`credit score`.`is worse than`(good)).then(allow(`advance payment`))
-        .or(
-            provided(`credit card`).then(
-                allow(`credit card payment`.and(`advance payment`))
-            )
-        )
-        .otherwise(
+    provided(`credit score` `is worse than` good) then allow(`advance payment`) or
+            (provided(`credit card`) then allow(`credit card payment` and `advance payment`)) otherwise
             allow(`advance payment`)
-        )
 
