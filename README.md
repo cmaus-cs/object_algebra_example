@@ -11,7 +11,7 @@ Mixture of domain logic and implementation details:
 - What is NonEmptyList ?
 - What is all this XXXService stuff doing?
 
-## Step2: internal dsl
+## Step 2: internal dsl
 
 More readable business code -> see method selectPaymentMethods
 
@@ -49,6 +49,16 @@ clear separation between the domain language layer and the implementation.
 The algebra (= interface) does impose no restriction on the actual
 data type that is used to represent domain constructs.
 
+That limits the possibilities to unintentionally switch to a lower implementation 
+level. As all domain constructs are represented as type variables or as generic functions working with these type variables, 
+there is not much that we as developers can do with these domain constructs when using the algebra api.
+
+That helps us to verify if a domain rule can be expressed using the domain language
+It might help us uncover any missing concepts in our domain vocabulary.
+
+The abstract domain concepts are mapped to concrete representations only in the
+implementations of the algebra.
+
 This allows to interpret the dsl in multiple ways.
 E.g. it allows to create a string/html representation from the code
-itself
+itself besides executing the code.
