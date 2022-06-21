@@ -1,53 +1,60 @@
 package example.algebra
 
-@JvmInline
-value class PrintCreditScore(val value: String)
+object PaymentSelectionAlgebraPrinter : PaymentSelectionAlgebra<
+        PaymentSelectionAlgebraPrinter.CreditScore,
+        PaymentSelectionAlgebraPrinter.Condition,
+        PaymentSelectionAlgebraPrinter.UserCreditScore,
+        PaymentSelectionAlgebraPrinter.PaymentRestriction,
+        PaymentSelectionAlgebraPrinter.PaymentSelection,
+        PaymentSelectionAlgebraPrinter.PaymentRule,
+        PaymentSelectionAlgebraPrinter.RuleHead> {
 
-@JvmInline
-value class PrintCondition(val value: String)
+    override val good = CreditScore("good")
+    override val average = CreditScore("average")
+    override val bad = CreditScore("bad")
 
-@JvmInline
-value class PrintUserCreditScore(val value: String)
+    override val `advance payment` = PaymentRestriction("advance payment")
+    override val `credit card payment` = PaymentRestriction("credit card payment")
+    override val `credit score` = UserCreditScore("credit score")
+    override val `credit card` = Condition("credit card")
 
-@JvmInline
-value class PrintPaymentRestriction(val value: String)
+    override fun UserCreditScore.`is worse than`(other: CreditScore) =
+        Condition("${this.value} is worse than ${other.value}")
 
-@JvmInline
-value class PrintPaymentSelection(val value: String)
+    override fun allow(paymentMethods: PaymentRestriction) = PaymentSelection("allow ${paymentMethods.value}")
 
-@JvmInline
-value class PrintPaymentRule(val value: String)
+    override fun PaymentRestriction.and(other: PaymentRestriction) =
+        PaymentRestriction("${this.value} and ${other.value}")
 
-@JvmInline
-value class PrintRuleHead(val value: String)
+    override fun PaymentRule.otherwise(restriction: PaymentSelection) =
+        PaymentSelection("${this.value}\notherwise\n${restriction.value}")
 
-object PaymentSelectionAlgebraPrinter :
-    PaymentSelectionAlgebra<PrintCreditScore, PrintCondition, PrintUserCreditScore, PrintPaymentRestriction, PrintPaymentSelection, PrintPaymentRule, PrintRuleHead> {
+    override fun provided(condition: Condition) = RuleHead("provided ${condition.value}")
 
-    override val good = PrintCreditScore("good")
-    override val average = PrintCreditScore("average")
-    override val bad = PrintCreditScore("bad")
+    override fun PaymentRule.or(next: PaymentRule) = PaymentRule("${this.value}\nor\n${next.value}")
 
-    override val `advance payment` = PrintPaymentRestriction("advance payment")
-    override val `credit card payment` = PrintPaymentRestriction("credit card payment")
-    override val `credit score` = PrintUserCreditScore("credit score")
-    override val `credit card` = PrintCondition("credit card")
+    override fun RuleHead.then(restriction: PaymentSelection) =
+        PaymentRule("${this.value} then ${restriction.value}")
 
-    override fun PrintUserCreditScore.`is worse than`(other: PrintCreditScore) =
-        PrintCondition("${this.value} is worse than ${other.value}")
+    @JvmInline
+    value class CreditScore(val value: String)
 
-    override fun allow(paymentMethods: PrintPaymentRestriction) = PrintPaymentSelection("allow ${paymentMethods.value}")
+    @JvmInline
+    value class Condition(val value: String)
 
-    override fun PrintPaymentRestriction.and(other: PrintPaymentRestriction) =
-        PrintPaymentRestriction("${this.value} and ${other.value}")
+    @JvmInline
+    value class UserCreditScore(val value: String)
 
-    override fun PrintPaymentRule.otherwise(restriction: PrintPaymentSelection) =
-        PrintPaymentSelection("${this.value}\notherwise\n${restriction.value}")
+    @JvmInline
+    value class PaymentRestriction(val value: String)
 
-    override fun provided(condition: PrintCondition) = PrintRuleHead("provided ${condition.value}")
+    @JvmInline
+    value class PaymentSelection(val value: String)
 
-    override fun PrintPaymentRule.or(next: PrintPaymentRule) = PrintPaymentRule("${this.value}\nor\n${next.value}")
+    @JvmInline
+    value class PaymentRule(val value: String)
 
-    override fun PrintRuleHead.then(restriction: PrintPaymentSelection) =
-        PrintPaymentRule("${this.value} then ${restriction.value}")
+    @JvmInline
+    value class RuleHead(val value: String)
+
 }
