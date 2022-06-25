@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "1.7.0"
     application
 }
 
@@ -14,6 +14,9 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+    implementation("com.github.h0tk3y.betterParse:better-parse:0.4.4")
+    implementation("io.arrow-kt:arrow-core:1.1.2")
+    testImplementation("io.mockk:mockk:1.12.4")
 }
 
 tasks.test {
