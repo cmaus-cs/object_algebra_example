@@ -16,33 +16,27 @@ class PaymentSelectionDslInterpreter(
     override val average = CreditScore.AVERAGE
     override val bad = CreditScore.BAD
 
-    override val `advance payment` = PaymentRestriction(AdvancePayment.nel())
-    override val `credit card payment` = PaymentRestriction(CreditCardPayment.nel())
+    override val `advance payment`: PaymentRestriction = TODO()
+    override val `credit card payment`: PaymentRestriction = TODO()
 
-    override val `credit score` = PaymentSelectionDsl.UserCreditScore(creditScoreService::creditScore)
-    override val `credit card` = PaymentSelectionDsl.Condition { paymentService.creditCardType(it) != null }
-    override fun (PaymentSelectionDsl.UserCreditScore).`is worse than`(other: CreditScore) =
-        PaymentSelectionDsl.Condition { this(it) < other }
+    override val `credit score`: PaymentSelectionDsl.UserCreditScore = TODO()
+    override val `credit card`: PaymentSelectionDsl.Condition = TODO()
+    override fun (PaymentSelectionDsl.UserCreditScore).`is worse than`(other: CreditScore): PaymentSelectionDsl.Condition =
+        TODO()
 
-    override fun PaymentSelectionDsl.PaymentRule.otherwise(restriction: PaymentSelectionDsl.PaymentSelection) =
-        PaymentSelectionDsl.PaymentSelection {
-            this(it) ?: restriction(it)
-        }
+    override fun PaymentSelectionDsl.PaymentRule.otherwise(restriction: PaymentSelectionDsl.PaymentSelection): PaymentSelectionDsl.PaymentSelection =
+        TODO()
 
-    override fun provided(condition: PaymentSelectionDsl.Condition) = PaymentSelectionDsl.RuleHead { condition(it) }
+    override fun provided(condition: PaymentSelectionDsl.Condition): PaymentSelectionDsl.RuleHead = TODO()
 
-    override fun PaymentSelectionDsl.PaymentRule.or(next: PaymentSelectionDsl.PaymentRule) =
-        PaymentSelectionDsl.PaymentRule { this(it) ?: next(it) }
+    override fun PaymentSelectionDsl.PaymentRule.or(next: PaymentSelectionDsl.PaymentRule): PaymentSelectionDsl.PaymentRule =
+        TODO()
 
-    override fun PaymentSelectionDsl.RuleHead.then(selection: PaymentSelectionDsl.PaymentSelection) =
-        PaymentSelectionDsl.PaymentRule {
-            if (this(it)) selection(it) else null
-        }
+    override fun PaymentSelectionDsl.RuleHead.then(selection: PaymentSelectionDsl.PaymentSelection): PaymentSelectionDsl.PaymentRule =
+        TODO()
 
-    override fun allow(paymentMethods: PaymentRestriction) = PaymentSelectionDsl.PaymentSelection {
-        paymentMethods
-    }
+    override fun allow(paymentMethods: PaymentRestriction): PaymentSelectionDsl.PaymentSelection = TODO()
 
-    override fun PaymentRestriction.and(other: PaymentRestriction) = PaymentRestriction(this.value + other.value)
+    override fun PaymentRestriction.and(other: PaymentRestriction): PaymentRestriction = TODO()
 
 }
