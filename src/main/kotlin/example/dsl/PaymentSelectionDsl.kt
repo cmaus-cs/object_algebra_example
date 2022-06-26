@@ -37,13 +37,15 @@ interface PaymentSelectionDsl {
         operator fun invoke(user: User): Boolean
     }
 
+    fun interface Condition {
+        operator fun invoke(user: User): Boolean
+    }
+
     fun interface PaymentSelection {
         operator fun invoke(user: User): PaymentRestriction
     }
 
-    fun interface Condition {
-        operator fun invoke(user: User): Boolean
-    }
+
 
     fun interface UserCreditScore {
         operator fun invoke(user: User): CreditScore
@@ -53,13 +55,13 @@ interface PaymentSelectionDsl {
 
 context(PaymentSelectionDsl)
 fun selectPaymentMethods(): PaymentSelectionDsl.PaymentSelection =
-    provided(`credit score`.`is worse than`(good)).then(allow(`advance payment`))
-        .or(
-            provided(`credit card`).then(
-                allow(`credit card payment`.and(`advance payment`))
-            )
-        )
-        .otherwise(
-            allow(`advance payment`)
-        )
+    TODO(
+        """
+        provided a credit score is worse than good then allow advance payment
+        provided a credit card exists the payment methods allowed are credit card payment and advance payment
+        if none of the above allow advance payment
+        """
+    )
+
+
 
