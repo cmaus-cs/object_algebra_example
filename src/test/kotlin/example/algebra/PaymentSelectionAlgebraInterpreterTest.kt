@@ -4,6 +4,8 @@ import arrow.core.nel
 import arrow.core.nonEmptyListOf
 import com.github.h0tk3y.betterParse.parser.toParsedOrThrow
 import example.model.*
+import example.service.CreditScoreService
+import example.service.PaymentService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -11,35 +13,32 @@ internal class PaymentSelectionAlgebraInterpreterTest {
 
     val user = User("detlef")
 
+    val program = with(PaymentSelectionAlgebraInterpreter) {
+        selectPaymentMethods()
+    }
+
     @Test
     fun `should use the proper default payment methods`() {
 
-        val interpreter = PaymentSelectionAlgebraInterpreter(
-            paymentService = { null },
-            creditScoreService = { CreditScore.GOOD },
-        )
-
-        with(interpreter) {
-            val program = selectPaymentMethods()
-            val result = program(user)
-            assertEquals(AdvancePayment.nel(), result.value)
+        val result = with(PaymentService { null }) {
+            with(CreditScoreService { CreditScore.GOOD }) {
+                program.eval(user)
+            }
         }
+
+        assertEquals(AdvancePayment.nel(), result.value)
     }
 
     @Test
     fun `should use credit card advance payment if applicable`() {
 
-        val interpreter = PaymentSelectionAlgebraInterpreter(
-            paymentService = { CreditCardType.AMEX },
-            creditScoreService = { CreditScore.GOOD },
-        )
-
-        with(interpreter) {
-            val program = selectPaymentMethods()
-            val result = program(user)
-            assertEquals(nonEmptyListOf(CreditCardPayment, AdvancePayment), result.value)
+        val result = with(PaymentService { CreditCardType.AMEX }) {
+            with(CreditScoreService { CreditScore.GOOD }) {
+                program.eval(user)
+            }
         }
 
+        assertEquals(nonEmptyListOf(CreditCardPayment, AdvancePayment), result.value)
     }
 
     @Test
@@ -52,18 +51,18 @@ internal class PaymentSelectionAlgebraInterpreterTest {
             allow advance payment
         """.trimIndent()
 
-        val interpreter = PaymentSelectionAlgebraInterpreter(
-            paymentService = { CreditCardType.AMEX },
-            creditScoreService = { CreditScore.GOOD },
-        )
-
-        with(interpreter) {
+        val program = with(PaymentSelectionAlgebraInterpreter) {
             val (tokenizer, parser) = createParser()
             val parseResult = parser.tryParse(tokenizer.tokenize(inputString), 0)
-            val program = parseResult.toParsedOrThrow().value
-
-            val result = program(user)
-            assertEquals(nonEmptyListOf(CreditCardPayment, AdvancePayment), result.value)
+            parseResult.toParsedOrThrow().value
         }
+
+        val result = with(PaymentService { CreditCardType.AMEX }) {
+            with(CreditScoreService { CreditScore.GOOD }) {
+                program.eval(user)
+            }
+        }
+
+        assertEquals(nonEmptyListOf(CreditCardPayment, AdvancePayment), result.value)
     }
 }
